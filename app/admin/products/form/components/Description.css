@@ -1,0 +1,9 @@
+.custom-simplemde .CodeMirror {
+    border-radius: 0.75rem;
+    min-height: 100px;
+  }
+  
+  .custom-simplemde .editor-toolbar {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }

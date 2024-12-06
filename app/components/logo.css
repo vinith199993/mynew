@@ -1,0 +1,16 @@
+.logo {
+    height: 1.5rem; /* Default size */
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  .logo:hover {
+    transform: scale(1.2); /* Slight zoom-in effect */
+    filter: drop-shadow(0 0 5px rgba(0, 123, 255, 0.8)); /* Glowing effect */
+  }
+  
+  @media (min-width: 768px) {
+    .logo {
+      height: 2rem; /* Larger size for bigger screens */
+    }
+  }
+  

@@ -1,0 +1,28 @@
+/* Styling for the category section */
+.category-card {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Hover effect for images */
+  .category-image-container img {
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .category-image-container img:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Title hover effect */
+  h1 {
+    font-size: 1.25rem;
+  }
+  
+  h1:hover {
+    color: #bfc2c9;
+  }
+  
