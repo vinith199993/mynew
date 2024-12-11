@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.17.7",
+    "@algolia/autocomplete-theme-classic": "^1.17.7",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.10",
@@ -40,7 +42,8 @@
     "slate-history": "^0.110.3",
     "slate-react": "^0.111.0",
     "slick-carousel": "^1.8.1",
-    "swr": "^2.2.5"
+    "swr": "^2.2.5",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "postcss": "^8",

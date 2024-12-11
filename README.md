@@ -139,17 +139,3 @@ service firebase.storage {
 }
 ```
 
-## Demo
-
-You can explore the demo of the e-commerce website at [this link](https://docs-reader-store.vercel.app). 
-
-To access the Admin Panel, use the following credentials:
-
-- **Email**: admin@gmail.com
-- **Password**: iloveyou
-
-(Note: This demo admin account has read and write permissions disabled for security purposes.)
-
-## Conclusion
-
-This project provides a robust e-commerce solution leveraging modern technologies. Feel free to customize and extend its functionality as needed.

@@ -15,6 +15,10 @@ export const createNewProduct = async ({ data, featureImage, imageList }) => {
   if (!featureImage) {
     throw new Error("Feature Image is required");
   }
+  if (!data?.keywords || data?.keywords.length === 0) {
+    throw new Error("At least one keyword is required");
+  }
+
   const featureImageRef = ref(storage, `products/${featureImage?.name}`);
   await uploadBytes(featureImageRef, featureImage);
   const featureImageURL = await getDownloadURL(featureImageRef);
@@ -36,6 +40,7 @@ export const createNewProduct = async ({ data, featureImage, imageList }) => {
     featureImageURL: featureImageURL,
     imageList: imageURLList,
     id: newId,
+    keywords: data?.keywords, // Save keywords
     timestampCreate: Timestamp.now(),
   });
 };
@@ -46,6 +51,9 @@ export const updateProduct = async ({ data, featureImage, imageList }) => {
   }
   if (!data?.id) {
     throw new Error("ID is required");
+  }
+  if (!data?.keywords || data?.keywords.length === 0) {
+    throw new Error("At least one keyword is required");
   }
 
   let featureImageURL = data?.featureImageURL ?? "";
@@ -70,6 +78,7 @@ export const updateProduct = async ({ data, featureImage, imageList }) => {
     ...data,
     featureImageURL: featureImageURL,
     imageList: imageURLList,
+    keywords: data?.keywords, // Save keywords
     timestampUpdate: Timestamp.now(),
   });
 };
