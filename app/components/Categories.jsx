@@ -16,7 +16,7 @@ export default function Categories({ categories }) {
     slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true, // Enables automatic sliding
-    autoplaySpeed: 3000, // Time in milliseconds before sliding
+    autoplaySpeed: 2000, // Time in milliseconds before sliding
     initialSlide: 0,
     responsive: [
       {
@@ -53,7 +53,7 @@ export default function Categories({ categories }) {
 
   return (
     <div className="flex flex-col gap-8 justify-center overflow-hidden md:p-10 p-5">
-      <div className="flex justify-center w-full">
+      <div className="flex justify-center w-full border-2 border-gray-200 rounded-lg shadow-lg p-5 bg-white hover:shadow-xl transition-shadow duration-300">
         <h1 className="text-2xl font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300">
           Shop By Category
         </h1>

@@ -24,6 +24,7 @@ export default async function Home() {
       getProducts(),
       getBrands(),
     ]);
+  
 
   return (
     <main className="w-screen h-screen overflow-x-hidden overflow-y-auto">
@@ -31,8 +32,9 @@ export default async function Home() {
       <FeaturedProductSlider featuredProducts={featuredProducts} />
       <Collections collections={collections} />
       <Categories categories={categories} />
-      <ProductsGridView products={products} />
       <Brands brands={brands} />
+      <ProductsGridView products={products} />
+      
       <Footer />
     </main>
   );

@@ -9,12 +9,12 @@ import MyRating from "./MyRating";
 
 export default function ProductsGridView({ products }) {
   return (
-    <section className="w-full flex justify-center">
-      <div className="flex flex-col gap-5 max-w-[900px] p-5">
-        <h1 className="text-center font-semibold text-3xl  decoration-blue-500 decoration-2">
+    <section className="w-full flex justify-center py-10 bg-gray-50">
+      <div className="flex flex-col gap-5 max-w-[1200px] p-5 border border-gray-200 rounded-lg shadow-md bg-white">
+        <h1 className="text-center font-semibold text-4xl text-gray-800  decoration-blue-500 decoration-2 hover:text-blue-600 transition-colors duration-300">
           Products
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products?.map((item) => {
             return <ProductCard product={item} key={item?.id} />;
           })}
@@ -46,9 +46,9 @@ export function ProductCard({ product }) {
       </Link>
       <div className="">
         <h2 className="text-green-500 text-sm font-semibold">
-          Rs {product?.salePrice}{" "}
+        Rs {new Intl.NumberFormat('en-US').format(product?.salePrice)}{" "}
           <span className="line-through text-xs text-gray-600">
-            Rs {product?.price}
+          Rs {new Intl.NumberFormat('en-US').format(product?.price)}
           </span>
         </h2>
       </div>

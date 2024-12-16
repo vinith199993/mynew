@@ -2,21 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { getCategories } from "@/lib/firestore/categories/getCategories";
+import { getBrands } from "@/lib/firestore/brands/getBrands";
 import getProducts from "@/lib/firestore/products/getProducts";
 import getSuggestions from "@/lib/firestore/products/getSuggestions";
 import { ProductCard } from "@/app/components/Products";
 import SearchBox from "@/app/(pages)/search/components/SearchBox";
 
-export default function Page() {
+export default function SearchPage() {
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const [products, setProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [query, setQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("low-to-high");
   const [loading, setLoading] = useState(false);
 
-  // Fetch categories on mount
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -29,29 +32,44 @@ export default function Page() {
     fetchCategories();
   }, []);
 
-  // Fetch initial products when no category or query is selected
+  // Fetch brands
   useEffect(() => {
-    if (!selectedCategory && !query) {
-      const fetchInitialProducts = async () => {
+    const fetchBrands = async () => {
+      try {
+        const fetchedBrands = await getBrands();
+        setBrands(fetchedBrands);
+      } catch (error) {
+        console.error("Error fetching brands:", error);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  // Fetch products based on current filters
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!query && !selectedCategory) {
         setLoading(true);
         try {
-          const defaultProducts = await getProducts(null, null, sortOrder);
+          const defaultProducts = await getProducts(null, null, sortOrder, selectedBrand);
           setProducts(defaultProducts);
+          setSearchResults([]);
         } catch (error) {
-          console.error("Error fetching initial products:", error);
+          console.error("Error fetching products:", error);
         } finally {
           setLoading(false);
         }
-      };
-      fetchInitialProducts();
-    }
-  }, [selectedCategory, query, sortOrder]);
+      }
+    };
+    fetchProducts();
+  }, [selectedCategory, query, sortOrder, selectedBrand]);
 
-  const handleSearch = async (query, category, sortOrder) => {
+  const handleSearch = async (searchQuery, category, order, brand) => {
     setLoading(true);
     try {
-      const fetchedProducts = await getProducts(query, category, sortOrder || "low-to-high");
+      const fetchedProducts = await getProducts(searchQuery, category, order, brand);
       setSearchResults(fetchedProducts);
+      setProducts([]);
     } catch (error) {
       console.error("Error searching products:", error);
     } finally {
@@ -62,10 +80,9 @@ export default function Page() {
   const handleCategoryClick = async (categoryId) => {
     setLoading(true);
     try {
-      setSelectedCategory(categoryId);
-      const fetchedProducts = await getProducts(null, categoryId, sortOrder);
+      setSelectedCategory(selectedCategory === categoryId ? null : categoryId);
+      const fetchedProducts = await getProducts(query, categoryId || null, sortOrder, selectedBrand);
       setProducts(fetchedProducts);
-      setQuery("");
     } catch (error) {
       console.error("Error fetching category products:", error);
     } finally {
@@ -73,14 +90,14 @@ export default function Page() {
     }
   };
 
-  const clearCategorySelection = async () => {
+  const handleBrandClick = async (brandId) => {
     setLoading(true);
     try {
-      setSelectedCategory(null);
-      const fetchedProducts = await getProducts(query, null, sortOrder);
+      setSelectedBrand(selectedBrand === brandId ? null : brandId);
+      const fetchedProducts = await getProducts(query, selectedCategory, sortOrder, brandId || null);
       setProducts(fetchedProducts);
     } catch (error) {
-      console.error("Error clearing category selection:", error);
+      console.error("Error fetching products by brand:", error);
     } finally {
       setLoading(false);
     }
@@ -90,106 +107,100 @@ export default function Page() {
     setLoading(true);
     try {
       setSortOrder(order);
-      const fetchedProducts = await getProducts(query, selectedCategory, order);
+      const fetchedProducts = await getProducts(query, selectedCategory, order, selectedBrand);
       setProducts(fetchedProducts);
     } catch (error) {
-      console.error("Error changing sort order:", error);
+      console.error("Error sorting products:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-row">
-      <aside className="w-1/4 p-5 border-r border-gray-200">
-        <h2 className="text-center font-semibold text-xl mb-5">Categories</h2>
+    <div className="flex flex-col md:flex-row gap-6 bg-gradient-to-r from-white via-gray-50 to-gray-100 p-6 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl">
+      {/* Sidebar */}
+      <aside className="w-full md:w-1/4 p-5 border-b md:border-b-0 md:border-r border-gray-200 bg-gray-50 shadow-md rounded-lg text-gray-700 font-medium">
+        <h2 className="text-center font-semibold text-xl mb-5 text-blue-600">Categories</h2>
         <div className="flex flex-col gap-4">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
-              className={`px-4 py-2 rounded-lg border text-left ${
+              className={`px-4 py-2 rounded-lg border text-left transition-all duration-200 ${
                 selectedCategory === category.id
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200"
+                  : "bg-gray-200 hover:bg-blue-100"
               }`}
             >
               {category.name}
             </button>
           ))}
         </div>
-        <div className="mt-5">
-          <h3 className="text-center font-semibold text-lg mb-4">Sort by Price</h3>
-          <div className="flex justify-center gap-4">
+        <h3 className="text-center font-semibold text-lg mt-6 mb-4 text-blue-600">Brands</h3>
+        <div className="flex flex-col gap-4">
+          {brands.map((brand) => (
             <button
-              onClick={() => handleSortChange("low-to-high")}
-              className={`px-4 py-2 rounded-lg ${
-                sortOrder === "low-to-high" ? "bg-blue-500 text-white" : "bg-gray-200"
+              key={brand.id}
+              onClick={() => handleBrandClick(brand.id)}
+              className={`px-4 py-2 rounded-lg border text-left transition-all duration-200 ${
+                selectedBrand === brand.id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 hover:bg-blue-100"
               }`}
             >
-              Low to High
+              {brand.name}
             </button>
-            <button
-              onClick={() => handleSortChange("high-to-low")}
-              className={`px-4 py-2 rounded-lg ${
-                sortOrder === "high-to-low" ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-            >
-              High to Low
-            </button>
-          </div>
+          ))}
         </div>
-        {selectedCategory && (
+        <h3 className="text-center font-semibold text-lg mt-6 mb-4 text-blue-600">Sort by Price</h3>
+        <div className="flex justify-center gap-4">
           <button
-            onClick={clearCategorySelection}
-            className="mt-4 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+            onClick={() => handleSortChange("low-to-high")}
+            className={`px-4 py-2 rounded-lg ${
+              sortOrder === "low-to-high" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-blue-100"
+            }`}
           >
-            Clear Category Selection
+            Low to High
           </button>
-        )}
+          <button
+            onClick={() => handleSortChange("high-to-low")}
+            className={`px-4 py-2 rounded-lg ${
+              sortOrder === "high-to-low" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-blue-100"
+            }`}
+          >
+            High to Low
+          </button>
+        </div>
       </aside>
+
+      {/* Main Content */}
       <main className="flex-1 p-5">
-        <h1 className="text-center font-semibold text-2xl mb-5">Product Search</h1>
+        <h1 className="text-center font-semibold text-2xl mb-5 text-blue-600">Product Search</h1>
         <SearchBox
           onSearch={handleSearch}
           query={query}
           setQuery={setQuery}
-          categories={categories}
           fetchSuggestions={getSuggestions}
         />
         {loading ? (
-          <p className="text-center text-gray-500">Loading...</p>
+          <p className="text-center text-gray-500 mt-6">Loading...</p>
         ) : (
-          <>
-            {selectedCategory && (
-              <>
-                <h2 className="text-center font-semibold text-xl mt-5">
-                  Products in Selected Category
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                  {products.length > 0 ? (
-                    products.map((product) => (
-                      <ProductCard product={product} key={product.id} />
-                    ))
-                  ) : (
-                    <p className="text-center text-gray-500">
-                      No products found in this category.
-                    </p>
-                  )}
-                </div>
-              </>
+          <div>
+            {products.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {products.map((product) => (
+                  <ProductCard product={product} key={product.id} />
+                ))}
+              </div>
             )}
-            {!selectedCategory && searchResults.length > 0 && (
-              <>
-                <h2 className="text-center font-semibold text-xl mt-5">Search Results</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                  {searchResults.map((product) => (
-                    <ProductCard product={product} key={product.id} />
-                  ))}
-                </div>
-              </>
+            {searchResults.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                {searchResults.map((product) => (
+                  <ProductCard product={product} key={product.id} />
+                ))}
+              </div>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

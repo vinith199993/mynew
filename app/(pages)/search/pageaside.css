@@ -1,0 +1,8 @@
+aside {
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  
+  aside:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f0f8ff; /* Light blue tint for effect */
+  }

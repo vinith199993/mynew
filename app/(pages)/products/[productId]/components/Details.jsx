@@ -31,9 +31,9 @@ export default function Details({ product }) {
         {product?.shortDescription}
       </h2>
       <h3 className="text-green-500 font-bold text-lg">
-        Rs {product?.salePrice}{" "}
+      Rs {new Intl.NumberFormat('en-US').format(product?.price)}
         <span className="line-through text-gray-700 text-sm">
-          Rs {product?.price}
+        Rs {new Intl.NumberFormat('en-US').format(product?.price)}
         </span>
       </h3>
       <div className="flex flex-wrap items-center gap-4">

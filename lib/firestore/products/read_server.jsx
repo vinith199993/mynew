@@ -42,3 +42,14 @@ export const getProductsByCategory = async ({ categoryId }) => {
   );
   return list.docs.map((snap) => snap.data());
 };
+
+
+export const getProductsByBrand = async ({ brandId }) => {
+  const q = query(
+    collection(db, "products"),
+    where("brandId", "==", brandId)
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
